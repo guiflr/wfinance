@@ -1,0 +1,37 @@
+{
+  "name": "wfinance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
+    "prisma:generate": "npx prisma generate --schema=./src/prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate dev --name init --schema=./src/prisma/schema.prisma",
+    "prisma:studio": "npx prisma studio --schema=./src/prisma/schema.prisma"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@genkit-ai/core": "^1.14.0",
+    "@genkit-ai/flow": "^0.5.17",
+    "@genkit-ai/googleai": "^1.14.0",
+    "@prisma/client": "^3.15.2",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "genkit": "^1.14.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.24",
+    "nodemon": "^3.1.0",
+    "prisma": "^6.11.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

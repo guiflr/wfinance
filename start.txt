@@ -1,0 +1,45 @@
+Vamos criar um agente financeiro, para controle de finanças pessoais. Ele vai ser utilizado através do whatsapp pelos meus clientes, eles irão ter a possibilidade de enviar um gasto que realizaram, por exemplo: gasto com almoço 40,00 ou uma entrada por exemplo: salário 5.000. também poderão editar ou excluir uma informação através de um fluxo parecido com este:
+Usuário: Editar item.
+Agente: lista os últimos 5 lançamentos enumerados.
+Usuário: envia número que deseja editar
+Agente: Qual campo deseja alterar, valor ou descrição?
+Usuário: valor
+Agente: qual o novo valor?
+Usuário: 10.40
+Primeiramente pode salvar este fluxo localmente, crie um serviço que rode a cada 1 minuto para excluir os fluxos que ja se encerraram ou estão inativos por algum tempo.
+Agente: alteração realizada com sucesso.
+Mas você pode melhorar este fluxo caso seja possível, para deletar vai seguir a mesma idéia.
+O usuário também poderá listar as transações, por exemplo:
+Qual meus gastos da última semana
+A aplicação deve ser capaz de listar isso.
+Ou também o usuário pode perguntar:
+Qual item foi mais caro este mês
+Com qual categoria gastei mais dinheiro este mês
+
+Para ser possível cobrir todos os cenários possíveis para as perguntas dos usuários vamos utilizar MCP integrado com uma IA, vamos utilizar estas libs: genkit, @genkit-ai/googleai para criar os MCPs e integrar com a IA gemini, vamos utilizar este SDK para Nodejs do Gemini para se comunicar com IA @genkit-ai/googleai.
+
+Siga esta documentação para criar as tools ou MCPs: https://genkit.dev/docs/tool-calling/
+
+Vamos utilizar typescript
+ExpressJS para receber chamada do webhook do whatsapp.
+Prisma ORM
+SQLight como base de dados
+Campos da tabela movements:
+id
+description
+category
+category_slug
+phone_number
+type - enum expense ou entry
+
+Todas as consultas e comandos no banco de dados devem ser filtrados pelo numero de telefone(phone_number) do usuario do whatsapp.
+Lembre de criar várias queries utilizando os MCPs, por exemplo buscar dados entre duas datas, por slug, descrição
+Por entry e entre datas - between
+Por expense e data- between
+Para inserir
+Listar os últimos cincos para edição o deleção
+Crie os mais variados MCPs para que a IA consiga agir da melhor forma
+Utilize descrições concizas para os MCPs
+Crie um agente completo, se você ver formas de melhorar ainda mais este agente, você pode melhorar.
+Lembre que quando o usuário precisar editar ou deletar um item, quem deve interpretar isso num primeiro momento é a IA utilizando os fluxos de MCP para listar os ultimos 5 e após isso salvar no fluxo que é quando ele se inicia, sempre que tiver um fluxo salvo a aplicação deve voltar neste fluxo com o usuario e caso o fluxo seja quebrado de alguma forma ou o ususario envie alguma mensagem desconexa o fluxo deve ser deletado e reiniciado.
+Agora desenvolva está aplicação seguindo as melhores práticas de desenvolvimento, seguindo um código limpo e claro.
