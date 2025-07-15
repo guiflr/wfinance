@@ -88,6 +88,7 @@ export const pushNewStateOfFlow = ai.defineTool(
     inputSchema: z.object({
       phone_number: z.string(),
       from: z.enum(["model", "user"]),
+      active: z.boolean(),
       message: z.string(),
     }),
     outputSchema: z.any(),
@@ -100,7 +101,7 @@ export const pushNewStateOfFlow = ai.defineTool(
         message: input.message,
         date: new Date(),
       });
-      return flow
+      return {...flow, active: input.active}
     } else {
       activeFlows.push({
         phone_number: input.phone_number,

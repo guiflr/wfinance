@@ -8,6 +8,9 @@ import {
   deleteMovement,
   activeFlows,
 } from "./genkit";
+import { categories } from "./utils/categories";
+import { incomingCategories } from "./utils/incoming-categories";
+import { storeMessages } from "./utils/create-examples";
 
 const app = express();
 app.use(bodyParser.json());
@@ -46,6 +49,12 @@ app.post("/webhook", async (req: Request, res: Response) => {
     ${flowText}
 
     sempre salve o estado da conversa ou quando esta dentro de um fluxo quando o assunto for sobre editar ou excluir algo.
+
+    aqui estão alguns exemplos de categorias para você se basear no hora de criar uma categoria para um descrição: ${categories}
+
+    aqui estão alguns exemplos de categorias para ganhos(entradas) para você se basear no hora de criar uma categoria para um descrição:: ${incomingCategories} 
+
+    aqui estão alguns exemplos de mensagens que você pode receber e entender como um gasto: ${storeMessages}
 
     caso tenha outro numero de telefone no meio da mensagem, retorne uma mensagem dizendo que o número na mensagem não é permitido
     `;
