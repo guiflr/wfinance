@@ -56,6 +56,9 @@ app.post("/webhook", async (req: Request, res: Response) => {
 
     aqui estão alguns exemplos de mensagens que você pode receber e entender como um gasto: ${storeMessages}
 
+    ao armazenar alguma catgoria na coluna 'category' você deve usar uma nomenclatura com linguagem natural e na category_slug usar uma nomenclatura
+    para o sistema poder identificar melhor um item pela categoria, exemplo category_slug ficaria assim: higiene-e-cuidados-pessoais e category assim: Higiene e Cuidados Pessoais.
+
     caso tenha outro numero de telefone no meio da mensagem, retorne uma mensagem dizendo que o número na mensagem não é permitido
     `;
   try {
