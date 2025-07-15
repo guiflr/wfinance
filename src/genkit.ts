@@ -142,11 +142,12 @@ export const insertMovement = ai.defineTool(
   {
     name: "insertMovement",
     description:
-      "Insert a new movement, it can be an expense or an entry. description and amount are required, category is optional",
+      "Insert a new movement, it can be an expense or an entry.",
     inputSchema: z.object({
       description: z.string(),
       amount: z.number(),
-      category: z.string().optional(),
+      category: z.string(),
+      category_slug: z.string(),
       type: z.enum(["expense", "entry"]),
       phone_number: z.string(),
     }),
