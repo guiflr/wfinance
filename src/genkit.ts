@@ -330,7 +330,10 @@ export const deleteMovement = ai.defineTool(
     inputSchema: z.object({
       id: z.string(),
     }),
-    outputSchema: z.void(),
+    outputSchema: z.object({
+      success: z.boolean(),
+      message: z.string(),
+    }),
   },
   async (input: any) => {
     await prisma.movement.delete({
@@ -338,6 +341,10 @@ export const deleteMovement = ai.defineTool(
         id: input.id,
       },
     });
+    return {
+      success: true,
+      message: "Movement deleted successfully",
+    };
   }
 );
 
