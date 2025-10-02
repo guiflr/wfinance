@@ -60,6 +60,8 @@ app.post("/webhook", async (req: Request, res: Response) => {
     para o sistema poder identificar melhor um item pela categoria, exemplo category_slug ficaria assim: higiene-e-cuidados-pessoais e category assim: Higiene e Cuidados Pessoais.
 
     caso tenha outro numero de telefone no meio da mensagem, retorne uma mensagem dizendo que o número na mensagem não é permitido
+
+    Quando receber uma mensagem que não tem a ver com controle das finanças retorne: Mensagem fora do meu escopo de atuação!
     `;
   try {
     const result = await runFlow(menuFlow, messageWithNumber);
