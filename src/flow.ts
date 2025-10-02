@@ -1,19 +1,20 @@
 
 import { defineFlow, run } from '@genkit-ai/flow';
 import * as z from 'zod';
-import { 
-    insertMovement, 
-    listLastFiveMovements, 
-    getMovementsBetweenDates, 
-    getMovementsBySlug, 
-    getMovementsByDescription, 
-    updateMovement, 
-    deleteMovement, 
+import {
+    insertMovement,
+    listLastFiveMovements,
+    getMovementsBetweenDates,
+    getMovementsBySlug,
+    getMovementsByDescription,
+    updateMovement,
+    deleteMovement,
     getLastFiveItemsToDeleteOrEdit,
     findSomeActiveFlow,
     pushNewStateOfFlow,
     deleteFlow,
-    ai 
+    getMovementsGroupedByCategory,
+    ai
 } from './genkit';
 
 export const menuFlow = defineFlow(
@@ -26,18 +27,19 @@ export const menuFlow = defineFlow(
         const llmResponse = await run("run-llm", async () =>
             ai.generate({
                 prompt: prompt,
-                tools: [ 
-                    insertMovement, 
-                    listLastFiveMovements, 
-                    getMovementsBetweenDates, 
-                    getMovementsBySlug, 
-                    getMovementsByDescription, 
-                    updateMovement, 
+                tools: [
+                    insertMovement,
+                    listLastFiveMovements,
+                    getMovementsBetweenDates,
+                    getMovementsBySlug,
+                    getMovementsByDescription,
+                    updateMovement,
                     deleteMovement,
                     getLastFiveItemsToDeleteOrEdit,
                     findSomeActiveFlow,
                     pushNewStateOfFlow,
-                    deleteFlow
+                    deleteFlow,
+                    getMovementsGroupedByCategory
                 ],
             })
         );

@@ -341,4 +341,64 @@ export const deleteMovement = ai.defineTool(
   }
 );
 
+export const getMovementsGroupedByCategory = ai.defineTool(
+  {
+    name: "getMovementsGroupedByCategory",
+    description: "Get movements grouped by category with total amount per category. Optionally filter by date range and/or type (expense/entry)",
+    inputSchema: z.object({
+      phone_number: z.string(),
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+      type: z.enum(["expense", "entry"]).optional(),
+    }),
+    outputSchema: z.array(
+      z.object({
+        category: z.string(),
+        category_slug: z.string(),
+        total: z.number(),
+        count: z.number(),
+        type: z.string(),
+      })
+    ),
+  },
+  async (input: any) => {
+    const whereClause: any = {
+      phone_number: input.phone_number,
+    };
+
+    if (input.startDate && input.endDate) {
+      whereClause.createdAt = {
+        gte: new Date(input.startDate),
+        lte: new Date(input.endDate),
+      };
+    }
+
+    if (input.type) {
+      whereClause.type = input.type;
+    }
+
+    const movements = await prisma.movement.findMany({
+      where: whereClause,
+    });
+
+    const grouped = movements.reduce((acc: any, movement) => {
+      const key = `${movement.category_slug}_${movement.type}`;
+      if (!acc[key]) {
+        acc[key] = {
+          category: movement.category,
+          category_slug: movement.category_slug,
+          total: 0,
+          count: 0,
+          type: movement.type,
+        };
+      }
+      acc[key].total += movement.amount;
+      acc[key].count += 1;
+      return acc;
+    }, {});
+
+    return Object.values(grouped);
+  }
+);
+
 export { ai };
