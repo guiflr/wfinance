@@ -55,28 +55,40 @@ export const findSomeActiveFlow = ai.defineTool(
     inputSchema: z.object({
       phone_number: z.string(),
     }),
-    outputSchema: z
-      .object({
-        phone_number: z.string(),
-        active: z.boolean(),
-        messages: z.array(
-          z.object({
-            from: z.enum(["model", "user"]),
-            message: z.string(),
-            date: z.date(),
-          })
-        ),
-      })
-      .optional(),
+    outputSchema: z.object({
+      phone_number: z.string(),
+      active: z.boolean(),
+      messages: z.array(
+        z.object({
+          from: z.enum(["model", "user"]),
+          message: z.string(),
+          date: z.string(),
+        })
+      ),
+    }),
   },
   async (input: any) => {
     const findedFlow = activeFlows.find(
       (flow) => flow.phone_number === input.phone_number
     );
-    const flow = findedFlow
-      ? findedFlow
-      : { phone_number: input.phone_number, active: input.active,  messages: [] };
-    return flow;
+
+    if (findedFlow) {
+      return {
+        phone_number: findedFlow.phone_number,
+        active: findedFlow.active,
+        messages: findedFlow.messages.map((m) => ({
+          from: m.from,
+          message: m.message,
+          date: m.date.toISOString(),
+        })),
+      };
+    } else {
+      return {
+        phone_number: input.phone_number,
+        active: false,
+        messages: [],
+      };
+    }
   }
 );
 
@@ -91,27 +103,53 @@ export const pushNewStateOfFlow = ai.defineTool(
       active: z.boolean(),
       message: z.string(),
     }),
-    outputSchema: z.any(),
+    outputSchema: z.object({
+      phone_number: z.string(),
+      active: z.boolean(),
+      messages: z.array(
+        z.object({
+          from: z.enum(["model", "user"]),
+          message: z.string(),
+          date: z.string(),
+        })
+      ),
+    }),
   },
   async (input: any) => {
     const flow = activeFlows.find((f) => f.phone_number === input.phone_number);
     if (flow) {
+      flow.active = input.active;
       flow.messages.push({
-        from: input.from,        
+        from: input.from,
         message: input.message,
         date: new Date(),
       });
-      return {...flow, active: input.active}
+      return {
+        phone_number: flow.phone_number,
+        active: flow.active,
+        messages: flow.messages.map((m) => ({
+          from: m.from,
+          message: m.message,
+          date: m.date.toISOString(),
+        })),
+      };
     } else {
-      activeFlows.push({
+      const newFlow = {
         phone_number: input.phone_number,
         active: input.active,
         messages: [
           { from: input.from, message: input.message, date: new Date() },
         ],
-      });
-      const flow = activeFlows.find((f) => f.phone_number === input.phone_number);
-      return flow
+      };
+      activeFlows.push(newFlow);
+      return {
+        ...newFlow,
+        messages: newFlow.messages.map((m) => ({
+          from: m.from,
+          message: m.message,
+          date: m.date.toISOString(),
+        })),
+      };
     }
   }
 );
