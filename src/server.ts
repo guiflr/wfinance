@@ -48,7 +48,7 @@ app.post("/webhook", async (req: Request, res: Response) => {
 
     ${flowText}
 
-    sempre salve o estado da conversa ou quando esta dentro de um fluxo quando o assunto for sobre editar ou excluir algo.
+    sempre salve o estado da conversa quando esta dentro de um fluxo quando o assunto for sobre editar ou excluir algo.
 
     aqui estão alguns exemplos de categorias para você se basear no hora de criar uma categoria para um descrição: ${categories}
 
@@ -57,7 +57,7 @@ app.post("/webhook", async (req: Request, res: Response) => {
     aqui estão alguns exemplos de mensagens que você pode receber e entender como um gasto: ${storeMessages}
 
     ao armazenar alguma catgoria na coluna 'category' você deve usar uma nomenclatura com linguagem natural e na category_slug usar uma nomenclatura
-    para o sistema poder identificar melhor um item pela categoria, exemplo category_slug ficaria assim: higiene-e-cuidados-pessoais e category assim: Higiene e Cuidados Pessoais.
+    para o sistema poder identificar melhor um item pela categoria, exemplo category_slug ficaria assim: higiene-e-cuidados-pessoais e category assim: Higiene e Cuidados Pessoais, remova os caracteres especiais antes de salvar category_slug.
 
     caso tenha outro numero de telefone no meio da mensagem, retorne uma mensagem dizendo que o número na mensagem não é permitido
 
