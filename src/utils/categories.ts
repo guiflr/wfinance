@@ -74,10 +74,17 @@ Alimentação,Carnes,alimentacao
 Alimentação,Frutas,alimentacao
 Alimentação,Verduras,alimentacao
 Alimentação,Legumes,alimentacao
-Combustível, abastecimento, combustivel
-Combustível, gasolina, combustivel
-Combustível, diesel, combustivel
-Bebidas, refrigerante, bebida
-Bebidas, cerveja, bebida
-Bebidas, suco, bebida
+Combustível,abastecimento,combustivel
+Combustível,gasolina,combustivel
+Combustível,diesel,combustivel
+Bebidas,refrigerante,bebidas
+Bebidas,cerveja,bebidas
+Bebidas,suco,bebidas
+Remédio,remédio,remedio
+Rendimentos de investimentos, dividendo, rendimentos-de-investimentos
+Rendimentos de investimentos, dividendos, rendimentos-de-investimentos
+Rendimentos de investimentos, venda de ações, rendimentos-de-investimentos
+Rendimentos de investimentos, venda de Fiis, rendimentos-de-investimentos
+Investimentos, compra de Fiis, investimentos
+Investimentos, compra de ações, investimentos
 `
