@@ -82,6 +82,19 @@ app.post("/webhook", async (req: Request, res: Response) => {
     ao armazenar alguma catgoria na coluna 'category' você deve usar uma nomenclatura com linguagem natural e na category_slug usar uma nomenclatura
     para o sistema poder identificar melhor um item pela categoria, exemplo category_slug ficaria assim: higiene-e-cuidados-pessoais e category assim: Higiene e Cuidados Pessoais, remova os caracteres especiais antes de salvar category_slug.
 
+    IMPORTANTE - BUSCA SEMÂNTICA INTELIGENTE:
+    Quando o usuário buscar por categoria, SEMPRE use a ferramenta getMovementsBySemanticSearch.
+
+    Esta ferramenta permite que VOCÊ MESMO identifique relações semânticas entre o que o usuário pediu e as categorias disponíveis.
+    Seja criativo e inclusivo - pense em TODOS os termos relacionados, sinônimos e variações que podem se relacionar com o pedido do usuário.
+
+    Exemplos de raciocínio:
+    - Usuário pede "medicamento" → você pensa: pode estar como "remedio", "farmacia", "saude" → use relatedSlugs: ["remedio", "farmacia", "saude"]
+    - Usuário pede "comida" → você pensa: pode estar como "alimentacao", "supermercado", "mercado", "feira" → use relatedSlugs: ["alimentacao", "supermercado", "mercado"]
+    - Usuário pede "transporte" → você pensa: pode ser "combustivel", "uber", "taxi", "onibus" → use relatedSlugs: ["combustivel", "uber", "taxi", "onibus"]
+
+    Não há lista fixa - USE SEU RACIOCÍNIO para identificar relações. Quanto mais termos relacionados você incluir, melhor será o resultado.
+
     caso tenha outro numero de telefone no meio da mensagem, retorne uma mensagem dizendo que o número na mensagem não é permitido
 
     Quando receber uma mensagem que não tem a ver com controle das finanças retorne: Mensagem fora do meu escopo de atuação!

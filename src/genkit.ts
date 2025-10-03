@@ -9,6 +9,18 @@ const ai = genkit({
 import { prisma } from "./prisma/client";
 import { boolean, z } from "zod";
 
+// Helper function to normalize slugs (remove accents and special characters)
+const normalizeSlug = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+    .trim();
+};
+
 // In-memory store for active flows
 export const activeFlows: {
   phone_number: string;
@@ -191,14 +203,15 @@ export const insertMovement = ai.defineTool(
     }),
   },
   async (input: any) => {
+    const category = input.category || "general";
+    const categorySlug = input.category_slug || category;
+
     return await prisma.movement.create({
       data: {
         description: input.description,
         amount: input.amount,
-        category: input.category || "general",
-        category_slug: (input.category || "general")
-          .toLowerCase()
-          .replace(/ /g, "-"),
+        category: category,
+        category_slug: normalizeSlug(categorySlug),
         type: input.type,
         phone_number: input.phone_number,
       },
@@ -271,10 +284,10 @@ export const getMovementsBetweenDates = ai.defineTool(
 export const getMovementsBySlug = ai.defineTool(
   {
     name: "getMovementsBySlug",
-    description: "Get movements by category slug for a given phone number",
+    description: "Get movements by category slug or category name for a given phone number. You can search by exact slug (e.g., 'alimentacao') or by category name (e.g., 'Alimentação', 'alimentação'). This function will search in both category and category_slug fields.",
     inputSchema: z.object({
       phone_number: z.string(),
-      slug: z.string(),
+      slug: z.string().describe("Category slug or category name to search for. Can be partial match."),
     }),
     outputSchema: z.array(
       z.object({
@@ -287,10 +300,96 @@ export const getMovementsBySlug = ai.defineTool(
     ),
   },
   async (input: any) => {
+    // Try multiple search strategies to handle accents and different formats
+    const searchTermLower = input.slug.toLowerCase();
+    const searchWithDashes = searchTermLower.replace(/\s+/g, "-");
+    const normalizedSlug = input.slug
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-");
+
     return await prisma.movement.findMany({
       where: {
         phone_number: input.phone_number,
-        category_slug: input.slug,
+        OR: [
+          // Search with original term (lowercase)
+          {
+            category_slug: {
+              contains: searchTermLower,
+            },
+          },
+          // Search with dashes instead of spaces
+          {
+            category_slug: {
+              contains: searchWithDashes,
+            },
+          },
+          // Search with normalized (no accents)
+          {
+            category_slug: {
+              contains: normalizedSlug,
+            },
+          },
+        ],
+      },
+    });
+  }
+);
+
+export const getMovementsBySemanticSearch = ai.defineTool(
+  {
+    name: "getMovementsBySemanticSearch",
+    description: `Search for movements using semantic understanding and intelligent category mapping.
+
+    Use this tool when the user searches for items by category, even if they use different words than what's stored in the database.
+
+    You should analyze the user's search term and identify ALL semantically related categories that might match.
+    Think broadly about relationships - for example:
+    - "medicamento" relates to "remedio", "farmacia", "saude"
+    - "bebida" relates to "bebidas", "drinks", "refrigerante", "suco"
+    - "comida" relates to "alimentacao", "supermercado", "mercado"
+    - "roupa" relates to "vestuario", "roupas", "moda"
+    - "transporte" relates to "combustivel", "uber", "taxi", "onibus"
+
+    The available category examples from the system are in the main prompt. Use your understanding to map user terms to those categories.`,
+    inputSchema: z.object({
+      phone_number: z.string(),
+      searchTerm: z.string().describe("The semantic search term provided by the user"),
+      relatedSlugs: z.array(z.string()).describe("Array of category slugs that you believe are semantically related to the user's search term. Include ALL variations and related terms you can think of. Be creative and inclusive - it's better to include more related terms than to miss relevant data."),
+    }),
+    outputSchema: z.array(
+      z.object({
+        id: z.string(),
+        description: z.string(),
+        amount: z.number(),
+        category: z.string(),
+        type: z.string(),
+      })
+    ),
+  },
+  async (input: any) => {
+    // Build OR conditions for all related slugs
+    const slugConditions = input.relatedSlugs.flatMap((slug: string) => {
+      const normalized = normalizeSlug(slug);
+      return [
+        { category_slug: { contains: normalized } },
+        { category_slug: { contains: slug.toLowerCase() } },
+        { category: { contains: slug } },
+      ];
+    });
+
+    // Also search in descriptions for the original search term
+    const normalizedSearchTerm = normalizeSlug(input.searchTerm);
+
+    return await prisma.movement.findMany({
+      where: {
+        phone_number: input.phone_number,
+        OR: [
+          ...slugConditions,
+          { description: { contains: input.searchTerm } },
+          { description: { contains: normalizedSearchTerm } },
+        ],
       },
     });
   }
@@ -345,18 +444,21 @@ export const updateMovement = ai.defineTool(
     }),
   },
   async (input: any) => {
+    const updateData: any = {
+      description: input.description,
+      amount: input.amount,
+      category: input.category,
+    };
+
+    if (input.category) {
+      updateData.category_slug = normalizeSlug(input.category);
+    }
+
     return await prisma.movement.update({
       where: {
         id: input.id,
       },
-      data: {
-        description: input.description,
-        amount: input.amount,
-        category: input.category,
-        category_slug: input.category
-          ? input.category.toLowerCase().replace(/ /g, "-")
-          : undefined,
-      },
+      data: updateData,
     });
   }
 );
