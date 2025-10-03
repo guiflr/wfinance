@@ -70,7 +70,7 @@ app.post("/webhook", async (req: Request, res: Response) => {
     - AI: *executa updateMovement com a nova descrição*
 
     Exemplo ERRADO (NÃO FAÇA ISSO):
-    - User: "descrição"
+    - User: "descrição", ou qualquer valor antes perguntar ao usuario: "Qual é a nova descrição?" ou valor que ele esta querendo editar.
     - AI: *executa updateMovement usando "descrição" como valor* ❌
 
     aqui estão alguns exemplos de categorias para você se basear no hora de criar uma categoria para um descrição: ${categories}

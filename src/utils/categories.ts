@@ -77,4 +77,7 @@ Alimentação,Legumes,alimentacao
 Combustível, abastecimento, combustivel
 Combustível, gasolina, combustivel
 Combustível, diesel, combustivel
+Bebidas, refrigerante, bebida
+Bebidas, cerveja, bebida
+Bebidas, suco, bebida
 `
