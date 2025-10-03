@@ -41,18 +41,41 @@ app.post("/webhook", async (req: Request, res: Response) => {
     message: ${message}
     telefone: ${from}
 
-    use esta data: ${new Date()} como base para criar os parametros startDate e endDate, crie as data neste formato de exemplo: '2025-07-09T20:26:37.784Z' 
+    use esta data: ${new Date()} como base para criar os parametros startDate e endDate, crie as data neste formato de exemplo: '2025-07-09T20:26:37.784Z'
 
     quando for usar filtros de data, lembre de colocar sempre o horario de inicio e fim do dia, por exemplo para buscar dados do dia atual, pegue os dados desde
     às 00:00 até as 23:59.
 
     ${flowText}
 
-    sempre salve o estado da conversa quando esta dentro de um fluxo quando o assunto for sobre editar ou excluir algo.
+    sempre salve o estado da conversa quando esta dentro de um fluxo quando o assunto for sobre editar ou excluir algo, retorne os itens para exclusão ou edição apenas enumerados e não o ID que esta salvo no banco.
+
+    IMPORTANTE - FLUXO DE EDIÇÃO:
+    O fluxo de edição DEVE seguir exatamente esta ordem, sem pular etapas:
+    1. Liste os últimos 5 itens numerados (1, 2, 3, 4, 5) para o usuário escolher
+    2. Pergunte qual número o usuário quer editar e aguarde a resposta
+    3. Após o usuário informar o número, pergunte qual campo deseja alterar (descrição, valor, categoria) e aguarde a resposta
+    4. Após o usuário informar o campo, pergunte qual é o NOVO VALOR para esse campo e aguarde a resposta
+    5. Caso a resposta seja descrição, e a nova descrição seja divergente da atual categoria, então atualize também a categoria de acordo com a nova descrição.
+    5. Somente após receber o novo valor, execute a ferramenta updateMovement com os dados corretos
+
+    NUNCA assuma valores ou pule etapas. SEMPRE pergunte e aguarde a resposta do usuário antes de prosseguir para a próxima etapa.
+    Exemplo CORRETO de fluxo:
+    - AI: "Qual item você quer editar? (1, 2, 3, 4 ou 5)"
+    - User: "2"
+    - AI: "Qual campo você quer alterar? (descrição, valor ou categoria)"
+    - User: "descrição"
+    - AI: "Qual é a nova descrição?"
+    - User: "compra de roupas"
+    - AI: *executa updateMovement com a nova descrição*
+
+    Exemplo ERRADO (NÃO FAÇA ISSO):
+    - User: "descrição"
+    - AI: *executa updateMovement usando "descrição" como valor* ❌
 
     aqui estão alguns exemplos de categorias para você se basear no hora de criar uma categoria para um descrição: ${categories}
 
-    aqui estão alguns exemplos de categorias para ganhos(entradas) para você se basear no hora de criar uma categoria para um descrição:: ${incomingCategories} 
+    aqui estão alguns exemplos de categorias para ganhos(entradas) para você se basear no hora de criar uma categoria para um descrição:: ${incomingCategories}
 
     aqui estão alguns exemplos de mensagens que você pode receber e entender como um gasto: ${storeMessages}
 
