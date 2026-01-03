@@ -3,9 +3,6 @@ import bodyParser from "body-parser";
 import { menuFlow } from "./flow";
 import { runFlow } from "@genkit-ai/flow";
 import {
-  listLastFiveMovements,
-  updateMovement,
-  deleteMovement,
   activeFlows,
 } from "./genkit";
 import { categories } from "./utils/categories";
