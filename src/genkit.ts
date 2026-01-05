@@ -1,12 +1,12 @@
-import { googleAI } from "@genkit-ai/googleai";
+import { googleAI } from "@genkit-ai/google-genai";
 import { genkit } from "genkit";
 
 const ai = genkit({
-	plugins: [googleAI()],
+	plugins: [googleAI({ apiKey: "AIzaSyBontOPP--wHQH5w6sjutlR7B61LTa4oiU" })],
 	model: googleAI.model("gemini-2.5-flash", { temperature: 0.5 }),
 });
 
-import { boolean, z } from "zod";
+import { z } from "zod";
 import { prisma } from "./prisma/client";
 
 // Helper function to normalize slugs (remove accents and special characters)
@@ -208,6 +208,15 @@ export const insertMovement = ai.defineTool(
 			category: z.string(),
 			category_slug: z.string(),
 			type: z.enum(["expense", "entry"]),
+			phone_number: z.string(),
+		}),
+		outputSchema: z.object({
+			id: z.string(),
+			description: z.string(),
+			amount: z.number(),
+			category: z.string(),
+			category_slug: z.string(),
+			type: z.string(),
 			phone_number: z.string(),
 		}),
 	},
@@ -529,7 +538,7 @@ export const getMovementsGroupedByCategory = ai.defineTool(
 			}),
 		),
 	},
-	async (input: any) => {
+	async (input: any): Promise<Array<{ category: string; category_slug: string; total: number; count: number; type: string }>> => {
 		const whereClause: any = {
 			phone_number: input.phone_number,
 		};
@@ -565,7 +574,7 @@ export const getMovementsGroupedByCategory = ai.defineTool(
 			return acc;
 		}, {});
 
-		return Object.values(grouped);
+		return Object.values(grouped) as Array<{ category: string; category_slug: string; total: number; count: number; type: string }>;
 	},
 );
 
